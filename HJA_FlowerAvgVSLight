@@ -1,0 +1,39 @@
+# Single Flower Category analysis
+# Now that Charlie and I have agreed on what flowers should be called multiple and what should be called single I am going to take these two datasets for HJA and run them through the GLMM sent my ariel last year.
+# Dataset I'm working with is titled hjaflowersingle.
+qplot(totallight, flravg, data=hjaflowersingle )+
+  facet_wrap(~species, ncol=3, scales='free_y')+ 
+  theme(axis.text.x = element_text(angle = 0, hjust = 1, size=13))+ 
+  theme(axis.title.y = element_text(size = rel(1.8), angle = 90))+ 
+  theme(axis.title.x = element_text(size = rel(1.8), angle = 00))+ 
+  theme(axis.text.y = element_text(angle = 0, hjust = 1, size=13))
+#Looks like my transect is showing as an interger and I think it should be a factor.
+hjaflowersingle.$transect <- as.factor(hjaflowersingle.$transect)
+# I took this from the DFE analysis script.
+library(lme4.0)
+hjasinglemod = glmer(flravg ~ totallight + offset(log(cover)) +(1|species) +(1|transect) + (1|transquad)+ (1|species:transquad)+ (1|species:transect),data = hjaflowersingle., family = "poisson")
+summary(hjasinglemod)
+hjaflowersingle$transect <- as.factor(hjaflowersingle$transect)
+hjasinglemodmancov = glmer(flowerdivcov ~ totallight +(1|species) +(1|transect) + (1|transquad)+ (1|species:transquad)+ (1|species:transect),data = hjaflowersingle, family = "poisson")
+summary(hjasinglemodmancov)
+library(ggplot2)
+qplot(totallight,flravg,  data=hjaflowersingle)+
+  labs(x = "Total Light (%)", y = "Flowering (flower count/m^2")+
+  ggtitle('H.J. Andrews')+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1, size=10))+ 
+  theme(axis.title.y = element_text(size = rel(2), angle = 90))+ 
+  theme(axis.title.x = element_text(size = rel(2), angle = 00))+ 
+  theme(axis.text.y = element_text(angle = 0, hjust = 1, size=10))+
+  scale_color_discrete(legend=FALSE)+
+  theme(plot.title = element_text(size = rel(2)))
+## Negative binomial analysis using dfe instead of light. (used this model with and without using cover as an offset)
+hjanbmultiple = glmer.nb(flravg ~ totallight + offset(cover)+(1|species) + (1|transect) + (1|transquad),data = hjaflowermultiple, control = glmerControl(optimizer = "bobyqa"))
+summary(hjanbdfe)
+hjanball@optinfo$warnings
+library(ggplot2)
+qplot(fitted(hjanball), resid(hjanball, type = "deviance"))
+exp(0.017281*10)
+(1.183292-1)*100
+confint(hjamultiplemod)
+exp(0.02138235*10)
+(1.238404-1)*100
